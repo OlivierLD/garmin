@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Garmin Forerunner 25</title>
+    <script type="text/javascript" src="jquery-2.1.3.js"></script>
+    <script type="text/javascript" src="graph/js/date.proto.js"></script>
+    <script type="text/javascript" src="graph/js/Graph.js"></script>
+    <script type="text/javascript" src="graph/data.graph.js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false&amp;key=AIzaSyDu5cW4UXjXZTswehBdIO8jCZdzUbk2v5o"
+            type="text/javascript"></script>
+    <style type="text/css">
+      .displayCanvas {
+        border: 1px solid #9C9898;
+        opacity:0.9;
+      }
+      .display-scheme
+      {
+        color: white;
+      }
+    </style>
+    <link rel="stylesheet" href="css/stylesheet.css" type="text/css"/>
+    <style type="text/css">
+      @font-face {
+        font-family: "Digi Font";
+        src: url(fonts/ds-digi.ttf) format("truetype");
+      }
+      .digifont {
+        font-family: "Digi Font", Verdana, Tahoma;
+        color: blue;
+      }
+    </style>
+    <style type="text/css">
+
+      .displayCanvas {
+        border: 1px solid #9C9898;
+        opacity:0.75;
+      }
+
+      .selectedButton {
+        padding:5px;
+        border-top-right-radius: 10px;
+        border:2px solid #CCC;
+        margin-top:10px;
+        border-bottom: none;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .unselectedButton {
+        padding:5px;
+        border-top-right-radius: 10px;
+        border:1px solid #CCC;
+        margin-top:10px;
+        border-bottom: none;
+        font-size: 12px;
+        font-weight: normal;
+      }
+    </style>
+    <style type="text/css">
+      .displayCanvas {
+        border: 1px solid #9C9898;
+        opacity:0.9;
+      }
+      .display-scheme
+      {
+        color: white;
+      }
+    </style>
+    <script>
+  // 2010 48th Avenue, SF, CA 94116
+  var defaultLocation = "37.74888723023488N,122.50712603330612W";
+  var defaultLat  =   37.74888723023488;
+  var defaultLong = -122.50712603330612;
+
+  var markers = [];
+  var map;
+
+  var setPosOnMap = function(lat, lon, idx, speed) {
+    try {
+       var marker = new google.maps.Marker({
+         position: new google.maps.LatLng(lat, lon),
+         map: map
+       });
+       var sf = getSpeedFactor();
+       var infoWin = new google.maps.InfoWindow({
+         content: 'Lat:' + formatPos(lat, "L") +
+                '<br>Lon:' + formatPos(lon, "G") +
+                '<br>Speed:' + (sf.sf * speed).toFixed(2) + " " + sf.unit
+       });
+       marker.addListener('click', function() {
+         infoWin.open(map, marker);
+       });
+       map.setCenter(new google.maps.LatLng(lat, lon));
+   //  map.setZoom(11);
+       markers.push(marker);
+    } catch (err) {
+      // In case Google Map APIs are not loaded...
+    }
+  };
+
+  var drawTrack = function(track) {
+    var coordinates = [];
+    track.forEach(function(pt, idx) {
+      var ptt = { lat: pt.lat, lng: pt.lon };
+      coordinates.push(ptt);
+    });
+    var trace = new google.maps.Polyline({
+      path: coordinates,
+      geodesic: true,
+      strokeColor: '#ff0000',
+      strokeOpacity: 1.0,
+      strokeWeight: 2
+    });
+    trace.setMap(null); // erase first
+    trace.setMap(map);
+  };
+
+  var loadMap = function() {
+    map = new google.maps.Map(document.getElementById("map"),
+                              {
+                                center: new google.maps.LatLng(defaultLat, defaultLong),
+                                zoom: 14,
+                                mapTypeId: google.maps.MapTypeId.SATELLITE
+                              });
+
+  // google.maps.event.addListener(map, 'click', function(event) {
+  //   placeMarker(event.latLng);
+  // });
+  };
+
+  var setAllMap = function(map) {
+    for (var i = 0; i < markers.length; i++) {
+      markers[i].setMap(map);
+    }
+  };
+
+  // Removes the markers from the map, but keeps them in the array.
+  var clearMarkers = function() {
+    setAllMap(null);
+  };
+
+  window.onload = function() {
+    loadMap();
+  };
+    </script>
+  </head>
+  <body>
+    <table width="99%" border="0">
+      <tr>
+        <td valign="top">
+          <h2>Garmin Forerunner 25</h2>
+        </td>
+        <td colspan="1" valign="top" align="right" rowspan="1">
+          <textarea id="spot" style="margin: 2px; height: 50px; width: 365px;" onchange="javascript:onDataChange();"></textarea>
+          <br/>
+          <small>Paste your JSON data &uarr; in the box above ...</small>
+        </td>
+        <td rowspan="4" valign="top"><div id="map" style="width: 400px; height: 450px;" title="Click on the Graph to see the wind on the map."></div></td>
+      </tr>
+      <tr>
+        <td align="left" colspan="1">
+          &nbsp;&nbsp;Speed Unit
+          <select id="speed-unit" onchange="displayData();">
+            <option value="kts">knots</option>
+            <option value="kmh" selected>km/h</option>
+            <option value="mph">mph</option>
+            <option value="ms">m/s</option>
+          </select>
+          &nbsp;&nbsp;<small>Click on the graph, if you dare...</small>
+        </td>
+        <td align="right">
+          <button onclick="clearMarkers();">Clear map</button>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" align="center">
+          &nbsp;<input type="checkbox" id="raw-data"    onchange="javascript:onDataChange();" checked="true">Raw
+          &nbsp;<input type="checkbox" id="smooth-data" onchange="javascript:onDataChange();" checked="true">Smoothed
+          &nbsp;<input type="checkbox" id="tooltip"     onchange="javascript:onDataChange();" checked="true">Tooltip
+          <br>
+          <canvas id="graphCanvas" width="800" height="200" class="displayCanvas"/> <!-- style="width: 98%;"/ -->
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" title="Clicked on the graph">
+          <div id="recno">Record...</div>
+        </td>
+      </tr>
+    </table>
+
+    <hr/>
+    <address>Oliv fecit, AD 2016.</address>
+  </body>
+</html>
