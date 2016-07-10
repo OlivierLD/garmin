@@ -6,6 +6,7 @@
     <script type="text/javascript" src="graph/js/date.proto.js"></script>
     <script type="text/javascript" src="graph/js/Graph.js"></script>
     <script type="text/javascript" src="graph/data.graph.js"></script>
+    <script type="text/javascript" src="navutils.js"></script>
     <script type="text/javascript" src="sample.data.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false&amp;key=AIzaSyDu5cW4UXjXZTswehBdIO8jCZdzUbk2v5o"
             type="text/javascript"></script>
@@ -102,7 +103,7 @@
   var drawTrack = function(track) {
     var coordinates = [];
     track.forEach(function(pt, idx) {
-      var ptt = { lat: pt.lat, lng: pt.lon };
+      var ptt = { lat: pt.getDataLat(), lng: pt.getDataLon() };
       coordinates.push(ptt);
     });
     var trace = new google.maps.Polyline({
@@ -156,7 +157,7 @@
           <br/>
           <small><a href="#" onclick="injectSampleData();">Inject</a> sample data, or paste your own JSON data &uarr; in the box above ...</small>
         </td>
-        <td rowspan="4" valign="top"><div id="map" style="width: 400px; height: 450px;" title="Click on the Graph to see the wind on the map."></div></td>
+        <td rowspan="5" valign="top"><div id="map" style="width: 400px; height: 450px;" title="Click on the Graph to see the wind on the map."></div></td>
       </tr>
       <tr>
         <td align="left" colspan="1">
@@ -185,6 +186,11 @@
       <tr>
         <td colspan="2" title="Clicked on the graph">
           <div id="recno">Record...</div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div id="stats">Stats...</div>
         </td>
       </tr>
     </table>

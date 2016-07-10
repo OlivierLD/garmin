@@ -106,31 +106,89 @@ var onDataChange = function() {
     var graphData = JSON.parse(text); // graphData is a json object.
     JSONParser.parse(graphData);
     displayData();
-    drawTrack(graphData);
   }
+};
+
+var computeStats = function () {
+    var graphData = JSONParser.graphData;
+    var stats = {};
+    if (graphData !== undefined && graphData.length > 0) {
+        var minTime = graphData[0].getDataTime();
+        var dist = 0;
+        var speedAcc = 0;
+        var maxTime = minTime;
+        var prevPos;
+        for (var i=0; i<graphData.length; i++) {
+          maxTime = graphData[i].getDataTime();
+          speedAcc += graphData[i].getDataSpeed();
+          if (prevPos !== undefined) {
+            dist += getDistance(prevPos, { lat: graphData[i].getDataLat(), lon: graphData[i].getDataLon() });
+          }
+          prevPos = { lat: graphData[i].getDataLat(), lon: graphData[i].getDataLon() };
+        }
+        stats = {
+          'from-time': minTime,
+          'to-time': maxTime,
+          'dist-in-m': dist * 1852,
+          'avg-speed': speedAcc / graphData.length
+        };
+    }
+    return stats;
+};
+
+var displayStats = function() {
+  var stats = computeStats();
+  console.log(stats);
+  var sf = getSpeedFactor();
+  var distUnit = "km";
+  var distFact = 1.0;
+  switch (sf.unit) {
+    case "kt":
+      distUnit = "nm";
+      distFact = 1 / 1852;
+      break;
+    case "km/h":
+      distUnit = "km";
+      distFact = 1 / 1000;
+      break;
+    case "mph":
+      distUnit = "miles";
+      distFact = 1 / 1609;
+      break;
+    case "m/s":
+      distUnit = "m";
+      distFact = 1.0;
+      break;
+    default:
+      break;
+  }
+  var txt = 'From ' + reformatDate(stats['from-time']) + ' to ' + reformatDate(stats['to-time']) +
+            ' (' + msToDuration(stats['to-time'] - stats['from-time']) + '), dist ' +
+            (distFact * stats['dist-in-m']).toFixed(4) + " " + distUnit + ", avg speed " + (sf.sf * stats['avg-speed']).toFixed(3) + " " + sf.unit;
+  $('#stats').text(txt);
 };
 
 var interval;
 
 var getSpeedFactor = function() {
     var speedUnit = document.getElementById("speed-unit").value;
-    var speedFactor = 1.0;
+    var speedFactor = 1.0; // In ms in the data
 //  console.log("Type: [" + type + "]");
     var unit = "kt";
     switch (speedUnit) {
       case "kts":
-        speedFactor = 1.0;
+        speedFactor = 3.6 / 1.852;
         break;
       case "kmh":
-        speedFactor = 1.852;
+        speedFactor = 3.6;
         unit = "km/h";
         break;
       case "mph":
-        speedFactor = (1.852 / 1.609);
+        speedFactor = (3.6 / 1.609);
         unit = "mph";
         break;
       case "ms":
-        speedFactor = (1.852 / 3.6);
+        speedFactor = 1.0;
         unit = "m/s";
         break;
       default:
@@ -155,10 +213,13 @@ var displayData = function() {
     // Last value recorded
     var idx = JSONParser.graphData.length - 1;
     var data = JSONParser.graphData[idx];
+    // Display value of last point.
     updateOnClick(idx,
                   data.getDataLat(),
                   data.getDataLon(),
                   data.getDataSpeed());
+    drawTrack(graphData);
+    displayStats();
   }
 };
 
