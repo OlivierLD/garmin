@@ -6,6 +6,7 @@
     <script type="text/javascript" src="graph/js/date.proto.js"></script>
     <script type="text/javascript" src="graph/js/Graph.js"></script>
     <script type="text/javascript" src="graph/data.graph.js"></script>
+    <script type="text/javascript" src="sample.data.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false&amp;key=AIzaSyDu5cW4UXjXZTswehBdIO8jCZdzUbk2v5o"
             type="text/javascript"></script>
     <style type="text/css">
@@ -151,9 +152,9 @@
           <h2>Garmin Forerunner 25</h2>
         </td>
         <td colspan="1" valign="top" align="right" rowspan="1">
-          <textarea id="spot" style="margin: 2px; height: 50px; width: 365px;" onchange="javascript:onDataChange();"></textarea>
+          <textarea id="spot" style="margin: 2px; height: 50px; width: 400px;" onchange="javascript:onDataChange();"></textarea>
           <br/>
-          <small>Paste your JSON data &uarr; in the box above ...</small>
+          <small><a href="#" onclick="injectSampleData();">Inject</a> sample data, or paste your own JSON data &uarr; in the box above ...</small>
         </td>
         <td rowspan="4" valign="top"><div id="map" style="width: 400px; height: 450px;" title="Click on the Graph to see the wind on the map."></div></td>
       </tr>
