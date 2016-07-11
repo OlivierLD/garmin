@@ -46,11 +46,18 @@ function Graph(cName,       // Canvas Name
       var idx = Math.round(x / xScale);
       if (idx < JSONParser.graphData.length) {
         var str = [];
-        try { 
+        var heading;
+        if (idx > 0) {
+           heading = bearing({lat: JSONParser.graphData[idx - 1].getDataLat(), lon:JSONParser.graphData[idx - 1].getDataLon()}, {lat: JSONParser.graphData[idx].getDataLat(), lon: JSONParser.graphData[idx].getDataLon()});
+        }
+        try {
           str.push(reformatDate(JSONParser.graphData[idx].getDataTime(), "d-M-Y H:i:s"));
           str.push("Lat : " + formatPos(JSONParser.graphData[idx].getDataLat(), 'L') + " ");
           str.push("Lon : " + formatPos(JSONParser.graphData[idx].getDataLon(), 'G') + " ");
           str.push("Speed: " + (sf.sf * JSONParser.graphData[idx].getDataSpeed()).toFixed(2) + " " + sf.unit);
+          if (heading !== undefined) {
+            str.push("Heading: " + radiansToDegrees(heading).toFixed(0) + "\272");
+          }
 //        console.log("Bubble:" + str);
         } catch (err) { 
           console.log(err); 

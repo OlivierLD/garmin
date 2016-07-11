@@ -83,11 +83,16 @@
          position: new google.maps.LatLng(lat, lon),
          map: map
        });
+       var heading;
+       if (idx > 0) {
+         heading = bearing({lat: JSONParser.graphData[idx - 1].getDataLat(), lon:JSONParser.graphData[idx - 1].getDataLon()}, {lat: lat, lon: lon});
+       }
        var sf = getSpeedFactor();
        var infoWin = new google.maps.InfoWindow({
          content: 'Lat:' + formatPos(lat, "L") +
                 '<br>Lon:' + formatPos(lon, "G") +
-                '<br>Speed:' + (sf.sf * speed).toFixed(2) + " " + sf.unit
+                '<br>Speed:' + (sf.sf * speed).toFixed(2) + " " + sf.unit +
+                (heading !== undefined ? ("<br>Heading:" + radiansToDegrees(heading).toFixed(0) + "\272") : "")
        });
        marker.addListener('click', function() {
          infoWin.open(map, marker);

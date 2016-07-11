@@ -38,12 +38,17 @@ var updateOnClick = function(idx, lat, lon, speed) {
   var txtDate = JSONParser.graphData[idx].getDataTime();
 //console.log("Date is : " + reformatDate(txtDate));
   var sf = getSpeedFactor();
+  var heading;
+  if (idx > 0) {
+    heading = bearing({lat: JSONParser.graphData[idx - 1].getDataLat(), lon:JSONParser.graphData[idx - 1].getDataLon()}, {lat: lat, lon: lon});
+  }
   document.getElementById("recno").innerHTML =
     "Record #<b style='color:red;'>" + (idx + 1) +
     "</b> of " + JSONParser.graphData.length + ", " +
     reformatDate(txtDate) + "  Lat: " + formatPos(lat, "L") +
                             ", Lon: " + formatPos(lon, 'G') +
-                            ", Speed: " + (sf.sf * speed).toFixed(2) + " " + sf.unit;
+                            ", Speed: " + (sf.sf * speed).toFixed(2) + " " + sf.unit +
+                            (heading !== undefined ? ("<br>Heading: " + radiansToDegrees(heading).toFixed(0) + "\272") : "");
 
   graph.drawGraph("graphCanvas", graphdata, idx);
 };
