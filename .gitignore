@@ -7,3 +7,4 @@
 *.iml
 .gradle
 **/build
+forerunner25/out/
