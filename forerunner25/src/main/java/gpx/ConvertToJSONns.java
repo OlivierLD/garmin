@@ -175,7 +175,7 @@ public class ConvertToJSONns
         prevLng = dLng;
         prevTime = lTime;
       }
-      System.out.println(String.format("Max Speed: %.03f km/h, time: %d ms, dist: %f km.", maxSpeed, deltaT, deltaDist));
+      System.out.println(String.format("Max Speed: %.03f km/h, time: %d ms, dist: %f m.", maxSpeed, deltaT, (deltaDist * 1_000)));
     }
   }
 }
