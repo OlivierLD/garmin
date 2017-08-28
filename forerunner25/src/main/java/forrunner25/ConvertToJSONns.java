@@ -17,10 +17,16 @@ public class ConvertToJSONns
   private final static String DATA_FILE = "data.gpx";
   private static final DateFormat GPX_FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
+
+    String fName = DATA_FILE;
+    if (args.length > 0) {
+      fName = args[0];
+    }
+
     DOMParser parser = new DOMParser();
 
-    parser.parse(new File(DATA_FILE).toURI().toURL());
+    parser.parse(new File(fName).toURI().toURL());
     XMLDocument doc = parser.getDocument();
 
     JSONArray jsonRoot = new JSONArray();
@@ -30,7 +36,7 @@ public class ConvertToJSONns
       System.out.println("Oops");
     } else {
       System.out.println("Moving on");
-      NSResolver resolver = string -> "http://www.topografix.com/GPX/1/0";
+	    NSResolver resolver = string -> "http://www.topografix.com/GPX/1/0";
       NodeList trkPts = doc.selectNodes("//gpx:trkpt", resolver);
       int count = trkPts.getLength();
       System.out.println(String.format("Found %d node(s)", count));

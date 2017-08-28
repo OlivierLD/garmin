@@ -14,10 +14,15 @@ public class ConvertToJSON {
 
   private final static String DATA_FILE = "data.gpx";
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
+    String fName = DATA_FILE;
+    if (args.length > 0) {
+      fName = args[0];
+    }
+
     DOMParser parser = new DOMParser();
 
-    parser.parse(new File(DATA_FILE).toURI().toURL());
+    parser.parse(new File(fName).toURI().toURL());
     XMLDocument doc = parser.getDocument();
 
     JSONObject jsonRoot = new JSONObject();

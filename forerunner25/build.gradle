@@ -8,11 +8,31 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
     maven { url "http://lediouris.net/maven2" }
+    maven { url "http://www.datanucleus.org/downloads/maven2" }
     mavenLocal()
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    compile 'oracle:xmlparser:v2'
+//  compile 'oracle:xmlparser:v2'
+    compile 'oracle:xmlparser:2.0'
     compile 'org.json:json:20141113'
+}
+
+task runConversion10(type: JavaExec, dependsOn: build, description: "Converts the GPX to JSON, GPX v1.0") {
+    main = 'forrunner25.ConvertToJSONns'
+    classpath project.configurations.default
+    classpath sourceSets.main.output.classesDir
+    if (project.hasProperty('gpx')) { // gradlew -Pgpx=XXXXX runConversion
+        args (project.getProperty('gpx'))
+    }
+}
+
+task runConversion11(type: JavaExec, dependsOn: build, description: "Converts the GPX to JSON, GPX v1.1") {
+    main = 'gpx.ConvertToJSONns'
+    classpath project.configurations.default
+    classpath sourceSets.main.output.classesDir
+    if (project.hasProperty('gpx')) { // gradlew -Pgpx=XXXXX runConversion
+        args (project.getProperty('gpx'))
+    }
 }
